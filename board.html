@@ -5,6 +5,9 @@
         /* Add your CSS here */
     </style>
     <script>
+        const TURNS_GREEN_DAYS = 3;
+        const TURNS_YELLOW_DAYS = 7;
+
         async function getRepositories(user) {
             const response = await fetch(`https://api.github.com/users/${user}/repos`);
             return await response.json();
@@ -33,19 +36,21 @@
             repoData.sort((a, b) => b.lastCommitDate - a.lastCommitDate);
 
             for (let data of repoData) {
+                console.log(data.repo);
                 const daysSinceLastCommit = Math.ceil((new Date() - data.lastCommitDate) / (1000 * 60 * 60 * 24));
 
                 let color = 'red';
-                if (daysSinceLastCommit <= 7) {
+                if (daysSinceLastCommit <= TURNS_YELLOW_DAYS) {
                     color = 'yellow';
                 }
-                if (daysSinceLastCommit <= 1) {
+                if (daysSinceLastCommit <= TURNS_GREEN_DAYS) {
                     color = 'green';
                 }
 
                 document.getElementById('repos').innerHTML += `
                     <div style="background-color: ${color};">
                         <h2>${data.repo.name}</h2>
+                        <p>Description: ${data.repo.description ?? 'No description exists for this repository'}</p>
                         <p>Last commit: ${data.lastCommitDate.toISOString().slice(0,10)}</p>
                     </div>
                 `;
