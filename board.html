@@ -19,10 +19,21 @@
         async function displayRepositories() {
             const user = 'emily-daitch';
             const repos = await getRepositories(user);
+            let repoData = [];
 
             for (let repo of repos) {
                 const lastCommitDate = await getLastCommitDate(user, repo.name);
-                const daysSinceLastCommit = Math.ceil((new Date() - lastCommitDate) / (1000 * 60 * 60 * 24));
+                repoData.push({
+                    repo: repo,
+                    lastCommitDate: lastCommitDate
+                });
+            }
+
+            // Sort the repoData array by last commit date, most recent first
+            repoData.sort((a, b) => b.lastCommitDate - a.lastCommitDate);
+
+            for (let data of repoData) {
+                const daysSinceLastCommit = Math.ceil((new Date() - data.lastCommitDate) / (1000 * 60 * 60 * 24));
 
                 let color = 'red';
                 if (daysSinceLastCommit <= 7) {
@@ -34,8 +45,8 @@
 
                 document.getElementById('repos').innerHTML += `
                     <div style="background-color: ${color};">
-                        <h2>${repo.name}</h2>
-                        <p>Last commit: ${lastCommitDate.toISOString().slice(0,10)}</p>
+                        <h2>${data.repo.name}</h2>
+                        <p>Last commit: ${data.lastCommitDate.toISOString().slice(0,10)}</p>
                     </div>
                 `;
             }
